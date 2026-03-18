@@ -24,7 +24,6 @@
       --avail-bg:       #dcfce7;
       --busy-red:       #dc2626;
       --busy-bg:        #fee2e2;
-      /* TMNT colors — each printer gets one of these */
       --leo:   #1a4a9c;
       --don:   #7b3fa0;
       --raph:  #c0392b;
@@ -49,7 +48,6 @@
     .field label { display:block; font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; }
     .field input, .field textarea, .field select { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:2px; font-family:'Roboto',sans-serif; font-size:.95rem; outline:none; transition:border-color .2s; }
     .field input:focus, .field textarea:focus { border-color:var(--uvm-green); }
-    .field textarea { resize:vertical; min-height:120px; font-size:.85rem; line-height:1.5; }
     #login-error { font-size:.85rem; color:var(--red); min-height:20px; margin-bottom:10px; }
     .btn-primary { width:100%; padding:13px; background:var(--uvm-green); color:var(--white); border:none; border-radius:2px; font-family:'Roboto',sans-serif; font-size:.95rem; font-weight:700; cursor:pointer; transition:background .2s; }
     .btn-primary:hover { background:var(--uvm-green-mid); }
@@ -86,8 +84,6 @@
     .nav-sub-item:hover { background:rgba(255,255,255,.06); color:rgba(255,255,255,.9); }
     .nav-sub-item.active { color:white; border-left-color:var(--uvm-gold); }
     .printer-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-
-    /* Printer status mini-cards in sidebar */
     .sidebar-printer-info { padding:6px 12px 4px; }
     .sidebar-printer-card { background:rgba(255,255,255,.07); border-radius:3px; padding:8px 10px; margin-bottom:4px; cursor:pointer; transition:background .15s; border-left:3px solid transparent; }
     .sidebar-printer-card:hover { background:rgba(255,255,255,.12); }
@@ -97,6 +93,8 @@
     .spc-status { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 6px; border-radius:10px; }
     .spc-status.free { background:rgba(21,128,61,.4); color:#86efac; }
     .spc-status.busy { background:rgba(220,38,38,.3); color:#fca5a5; }
+    .spc-status.offline { background:rgba(80,80,80,.5); color:#ccc; }
+    .spc-status.maintenance { background:rgba(180,120,0,.4); color:#fde68a; }
     .spc-bar-track { height:4px; background:rgba(255,255,255,.15); border-radius:2px; overflow:hidden; }
     .spc-bar-fill { height:100%; border-radius:2px; transition:width .6s; }
 
@@ -115,11 +113,15 @@
     .dash-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px; }
     .printer-card { background:var(--white); border:1.5px solid var(--border); border-radius:3px; padding:18px 20px; cursor:pointer; transition:border-color .2s,box-shadow .2s,transform .15s; border-top:4px solid var(--border); }
     .printer-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.09); transform:translateY(-2px); }
+    .printer-card.printer-down { opacity:.55; cursor:not-allowed; }
+    .printer-card.printer-down:hover { transform:none; box-shadow:none; }
     .card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
     .card-name { font-family:'Lora',serif; font-size:.95rem; color:var(--uvm-green); }
     .status-badge { font-size:.69rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:20px; }
     .status-badge.free { background:var(--avail-bg); color:var(--avail-green); }
     .status-badge.busy { background:var(--busy-bg); color:var(--busy-red); }
+    .status-badge.offline { background:#e5e7eb; color:#6b7280; }
+    .status-badge.maintenance { background:#fef3c7; color:#92400e; }
     .fullness-label { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
     .fl-text { font-size:.74rem; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
     .fl-pct { font-size:1rem; font-weight:700; color:var(--uvm-green); }
@@ -149,6 +151,10 @@
     .mini-fill { height:100%; border-radius:4px; transition:width .6s; }
     .mini-pct { font-size:.81rem; font-weight:700; color:var(--uvm-green); }
     .calendar-wrap { background:var(--white); border:1px solid var(--border); border-radius:3px; padding:20px; }
+    .printer-offline-banner { background:#f3f4f6; border:1.5px solid #d1d5db; border-radius:3px; padding:16px 20px; margin-bottom:14px; display:flex; align-items:center; gap:12px; }
+    .printer-offline-banner .pob-icon { font-size:1.3rem; }
+    .printer-offline-banner .pob-text { font-size:.88rem; color:var(--muted); }
+    .printer-offline-banner .pob-status { font-weight:700; color:var(--text); }
     .fc .fc-toolbar-title { font-family:'Lora',serif; font-size:1rem; color:var(--uvm-green); }
     .fc .fc-button-primary { background:var(--uvm-green) !important; border-color:var(--uvm-green) !important; font-family:'Roboto',sans-serif !important; border-radius:2px !important; font-size:.82rem !important; }
     .fc .fc-button-primary:hover { background:var(--uvm-green-mid) !important; }
@@ -161,7 +167,6 @@
     .fc .fc-day-today { background:rgba(21,71,52,.04) !important; }
     .fc .fc-col-header-cell.fc-day-today { background:var(--uvm-green) !important; }
     .fc .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion { color:var(--uvm-gold) !important; }
-    /* Per-printer calendar colors — each cal ID matches a printer index */
     #cal-0 .fc-event { background:var(--leo) !important; border-color:#0f2d60 !important; }
     #cal-1 .fc-event { background:var(--don) !important; border-color:#4a1d6a !important; }
     #cal-2 .fc-event { background:var(--raph) !important; border-color:#7b1a14 !important; }
@@ -179,6 +184,7 @@
     .br-info { flex:1; }
     .br-printer { font-weight:700; font-size:.88rem; color:var(--uvm-green); }
     .br-time { font-size:.81rem; color:var(--muted); margin-top:2px; }
+    .br-id { font-size:.72rem; color:var(--muted); font-family:monospace; margin-top:2px; opacity:.7; }
     .br-delete { background:none; border:1.5px solid var(--border); border-radius:2px; padding:4px 12px; font-size:.76rem; font-weight:700; color:var(--red); cursor:pointer; transition:background .2s,border-color .2s; font-family:'Roboto',sans-serif; }
     .br-delete:hover { background:var(--busy-bg); border-color:var(--busy-red); }
 
@@ -189,6 +195,8 @@
     .btn-action:hover { background:var(--uvm-green-mid); }
     .btn-danger { padding:8px 16px; background:none; color:var(--red); border:1.5px solid var(--red); border-radius:2px; font-family:'Roboto',sans-serif; font-size:.84rem; font-weight:700; cursor:pointer; }
     .btn-danger:hover { background:var(--busy-bg); }
+    .btn-warning { padding:6px 14px; background:none; color:#92400e; border:1.5px solid #d97706; border-radius:2px; font-family:'Roboto',sans-serif; font-size:.8rem; font-weight:700; cursor:pointer; }
+    .btn-warning:hover { background:#fef3c7; }
     .history-table { width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--border); border-radius:3px; overflow:hidden; font-size:.87rem; }
     .history-table th { background:var(--uvm-green-dark); color:rgba(255,255,255,.9); padding:10px 14px; text-align:left; font-size:.73rem; text-transform:uppercase; letter-spacing:.07em; font-weight:700; }
     .history-table td { padding:10px 14px; border-bottom:1px solid var(--border); }
@@ -217,12 +225,23 @@
     .x1-info-box h3 { font-family:'Lora',serif; font-size:1rem; color:var(--uvm-gold); margin-bottom:8px; }
     .x1-info-box p { font-size:.87rem; color:rgba(255,255,255,.8); line-height:1.6; }
 
-    /* ── ADMIN CSV TOOL ── */
+    /* ── ADMIN ── */
     .admin-tool-box { background:var(--white); border:1px solid var(--border); border-radius:3px; padding:24px; margin-bottom:20px; }
     .admin-tool-box h3 { font-family:'Lora',serif; font-size:1rem; color:var(--uvm-green); margin-bottom:6px; }
     .admin-tool-box p { font-size:.87rem; color:var(--muted); margin-bottom:16px; line-height:1.55; }
-    .csv-preview { background:var(--off-white); border:1px solid var(--border); border-radius:2px; padding:12px 14px; font-size:.8rem; font-family:monospace; color:var(--muted); margin-top:12px; max-height:160px; overflow-y:auto; white-space:pre; }
     .admin-actions { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+    .printer-status-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .printer-status-card { border:1.5px solid var(--border); border-radius:3px; padding:16px; }
+    .printer-status-card .pscard-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .printer-status-card .pscard-name { font-weight:700; font-size:.9rem; display:flex; align-items:center; gap:8px; }
+    .pscard-dot { width:10px; height:10px; border-radius:50%; }
+    .pscard-badge { font-size:.68rem; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:10px; }
+    .pscard-badge.online { background:var(--avail-bg); color:var(--avail-green); }
+    .pscard-badge.offline { background:#e5e7eb; color:#6b7280; }
+    .pscard-badge.maintenance { background:#fef3c7; color:#92400e; }
+    .pscard-controls { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .pscard-controls select { padding:5px 8px; border:1.5px solid var(--border); border-radius:2px; font-family:'Roboto',sans-serif; font-size:.8rem; outline:none; }
+    .pscard-note { width:100%; padding:5px 8px; border:1.5px solid var(--border); border-radius:2px; font-family:'Roboto',sans-serif; font-size:.8rem; outline:none; margin-top:6px; }
 
     /* ── MODALS ── */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:500; }
@@ -244,7 +263,7 @@
     #toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--uvm-green-dark); color:white; padding:9px 20px; border-radius:2px; font-size:.86rem; font-weight:500; border-left:4px solid var(--uvm-gold); box-shadow:0 8px 28px rgba(0,0,0,.25); transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .3s; opacity:0; z-index:999; pointer-events:none; white-space:nowrap; }
     #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
-    @media(max-width:1100px) { .dash-grid{grid-template-columns:repeat(2,1fr);} .rules-grid{grid-template-columns:1fr;} }
+    @media(max-width:1100px) { .dash-grid{grid-template-columns:repeat(2,1fr);} .rules-grid{grid-template-columns:1fr;} .printer-status-grid{grid-template-columns:1fr;} }
     @media(max-width:700px) { .dash-grid{grid-template-columns:1fr;} .app-body{flex-direction:column;} .sidebar{width:100%;} .page-body{padding:16px 14px 50px;} .page-header{padding:16px 14px 14px;} }
   </style>
 </head>
@@ -299,7 +318,6 @@
       </div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-section-label">Printers</div>
-      <!-- Printer info cards injected here by JS -->
       <div id="sidebar-printer-cards"></div>
       <div class="sidebar-divider"></div>
       <div class="nav-item" data-page="my-bookings">
@@ -338,7 +356,7 @@
         </div>
       </div>
 
-      <!-- OVERVIEW (all 4 printers overlaid) -->
+      <!-- OVERVIEW -->
       <div class="page" id="page-overview">
         <div class="page-header">
           <div class="breadcrumb">FabLab <span>›</span> All Printers</div>
@@ -351,7 +369,7 @@
         </div>
       </div>
 
-      <!-- SCHEDULE PAGES (4 printers) -->
+      <!-- SCHEDULE PAGES -->
       <div class="page" id="page-schedule-0">
         <div class="page-header">
           <div class="breadcrumb">FabLab <span>›</span> Printers <span>›</span> Leonardo</div>
@@ -359,6 +377,7 @@
           <p>Click or drag an open slot to book. Click your reservation to delete it.</p>
         </div>
         <div class="page-body">
+          <div id="printer-offline-banner-0"></div>
           <div class="schedule-header-bar">
             <div class="printer-color-tag"><div class="dot" style="background:var(--leo)"></div>Leonardo — This Week</div>
             <div class="mini-fullness"><div class="mini-track"><div class="mini-fill fill-low" id="mini-fill-0" style="width:0%"></div></div><span class="mini-pct" id="mini-pct-0">0% full</span></div>
@@ -374,6 +393,7 @@
           <p>Click or drag an open slot to book. Click your reservation to delete it.</p>
         </div>
         <div class="page-body">
+          <div id="printer-offline-banner-1"></div>
           <div class="schedule-header-bar">
             <div class="printer-color-tag"><div class="dot" style="background:var(--don)"></div>Donatello — This Week</div>
             <div class="mini-fullness"><div class="mini-track"><div class="mini-fill fill-low" id="mini-fill-1" style="width:0%"></div></div><span class="mini-pct" id="mini-pct-1">0% full</span></div>
@@ -389,6 +409,7 @@
           <p>Click or drag an open slot to book. Click your reservation to delete it.</p>
         </div>
         <div class="page-body">
+          <div id="printer-offline-banner-2"></div>
           <div class="schedule-header-bar">
             <div class="printer-color-tag"><div class="dot" style="background:var(--raph)"></div>Raphael — This Week</div>
             <div class="mini-fullness"><div class="mini-track"><div class="mini-fill fill-low" id="mini-fill-2" style="width:0%"></div></div><span class="mini-pct" id="mini-pct-2">0% full</span></div>
@@ -404,6 +425,7 @@
           <p>Click or drag an open slot to book. Click your reservation to delete it.</p>
         </div>
         <div class="page-body">
+          <div id="printer-offline-banner-3"></div>
           <div class="schedule-header-bar">
             <div class="printer-color-tag"><div class="dot" style="background:var(--mikey)"></div>Michelangelo — This Week</div>
             <div class="mini-fullness"><div class="mini-track"><div class="mini-fill fill-low" id="mini-fill-3" style="width:0%"></div></div><span class="mini-pct" id="mini-pct-3">0% full</span></div>
@@ -420,11 +442,11 @@
           <p>All your reservations — upcoming and past.</p>
         </div>
         <div class="page-body">
-          <div class="bookings-section" id="bookings-upcoming">
+          <div class="bookings-section">
             <div class="bookings-section-title">Upcoming</div>
             <div id="bookings-upcoming-list"></div>
           </div>
-          <div class="bookings-section" id="bookings-past">
+          <div class="bookings-section">
             <div class="bookings-section-title">Past</div>
             <div id="bookings-past-list"></div>
           </div>
@@ -503,11 +525,14 @@
           <p>Manage users and system settings.</p>
         </div>
         <div class="page-body">
+
+          <!-- Add User -->
           <div class="admin-tool-box">
             <h3>Add New User</h3>
             <p>Add a user to the database. Roles: <strong>admin</strong> (full access), <strong>user</strong> (can book), <strong>read</strong> (view only).</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
               <div class="field" style="margin:0;flex:2"><label>Full Name</label><input type="text" id="new-user-name" placeholder="Jane Smith"/></div>
+              <div class="field" style="margin:0;flex:2"><label>Email (optional)</label><input type="email" id="new-user-email" placeholder="jane@uvm.edu"/></div>
               <div class="field" style="margin:0;flex:1"><label>PIN</label><input type="password" id="new-user-pin" placeholder="••••" maxlength="8"/></div>
               <div class="field" style="margin:0;flex:1"><label>Role</label>
                 <select id="new-user-role">
@@ -519,18 +544,30 @@
               <button class="btn-action" id="btn-add-user" style="margin-bottom:18px">Add User</button>
             </div>
           </div>
+
+          <!-- Current Users -->
           <div class="admin-tool-box">
             <h3>Current Users</h3>
             <p>All users stored in the database.</p>
             <table style="width:100%;border-collapse:collapse;font-size:.88rem">
               <thead><tr style="background:var(--uvm-green-dark);color:white">
                 <th style="padding:8px 12px;text-align:left">Name</th>
+                <th style="padding:8px 12px;text-align:left">Email</th>
                 <th style="padding:8px 12px;text-align:left">Role</th>
                 <th style="padding:8px 12px;text-align:left">Action</th>
               </tr></thead>
               <tbody id="admin-current-users"></tbody>
             </table>
           </div>
+
+          <!-- Printer Status -->
+          <div class="admin-tool-box">
+            <h3>Printer Status</h3>
+            <p>Take a printer offline or mark it under maintenance. Users cannot book unavailable printers.</p>
+            <div class="printer-status-grid" id="admin-printer-status-grid"></div>
+          </div>
+
+          <!-- Danger Zone -->
           <div class="admin-tool-box">
             <h3>Danger Zone</h3>
             <p>Permanently delete all bookings across all printers.</p>
@@ -581,20 +618,9 @@
 
 <script>
 // ── UTILITIES ──
-
-// toast() — pops up a small notification bar at the bottom of the screen
-// I use this all over the place to tell the user what just happened (booked, deleted, error, etc.)
-// ms = how long it stays visible in milliseconds, default is 2800 (about 3 seconds)
 function toast(msg,ms=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),ms);}
-
-// showModal / hideModal — toggle the open class on a modal overlay so it appears/disappears
-// I pass in the modal's ID string (e.g. 'delete-modal') to target the right one
 function showModal(id){document.getElementById(id).classList.add('open');}
 function hideModal(id){document.getElementById(id).classList.remove('open');}
-
-// choiceModal() — a reusable yes/no confirmation popup
-// Returns a Promise so I can await it and get true (confirmed) or false (cancelled)
-// danger=true turns the confirm button red — I use that for destructive actions like clearing bookings
 function choiceModal({title='Confirm',message,confirmText='OK',cancelText='Cancel',danger=false}){
   return new Promise(resolve=>{
     document.getElementById('choice-title').textContent=title;
@@ -602,15 +628,11 @@ function choiceModal({title='Confirm',message,confirmText='OK',cancelText='Cance
     const ok=document.getElementById('choice-confirm'),no=document.getElementById('choice-cancel');
     ok.textContent=confirmText;no.textContent=cancelText;ok.className=danger?'btn-delete':'btn-confirm';
     showModal('choice-modal');
-    // cleanup removes event listeners so they don't stack up if the modal is opened multiple times
     const yes=()=>{cleanup();resolve(true);},nop=()=>{cleanup();resolve(false);};
     function cleanup(){hideModal('choice-modal');ok.removeEventListener('click',yes);no.removeEventListener('click',nop);}
     ok.addEventListener('click',yes);no.addEventListener('click',nop);
   });
 }
-
-// deleteModal() — specifically for deleting a reservation, shows the item's label in the message
-// Returns a Promise — resolves true if the user clicks Delete, false if they click Keep It
 function deleteModal(label){
   return new Promise(resolve=>{
     document.getElementById('delete-message').textContent=`Are you sure you want to delete "${label}"?`;
@@ -621,20 +643,14 @@ function deleteModal(label){
     document.getElementById('delete-cancel').addEventListener('click',no);
   });
 }
-
-// durationModal() — pops up when someone clicks a time slot to make a booking
-// Asks how many minutes the print will take, then resolves with that number (or null if cancelled)
-// I auto-focus the input after a tiny delay so the user can just start typing
 function durationModal(printerName,timeStr){
   return new Promise(resolve=>{
     document.getElementById('duration-info').textContent=`Booking on ${printerName} at ${timeStr}. How many minutes will your print take?`;
     document.getElementById('duration-input').value='';
     showModal('duration-modal');
     const ok=document.getElementById('duration-confirm'),no=document.getElementById('duration-cancel');
-    // go() validates the input before resolving — must be a positive number
     const go=()=>{const v=parseInt(document.getElementById('duration-input').value,10);if(!v||v<=0){toast('Please enter a valid number of minutes.');return;}cleanup();resolve(v);};
     const cancel=()=>{cleanup();resolve(null);};
-    // also let the user press Enter to confirm instead of clicking the button
     const key=e=>{if(e.key==='Enter')go();};
     function cleanup(){hideModal('duration-modal');ok.removeEventListener('click',go);no.removeEventListener('click',cancel);document.getElementById('duration-input').removeEventListener('keydown',key);}
     ok.addEventListener('click',go);no.addEventListener('click',cancel);
@@ -644,68 +660,78 @@ function durationModal(printerName,timeStr){
 }
 
 // ── STATE ──
-// These are the main global variables I use throughout the app
-let currentUser=null;  // stores the logged-in user's name and role after login
-let authToken=null;    // the JWT token I get from the server on login — attached to every API request
+let currentUser=null;
+let authToken=null;
+let printerStatuses=[{status:'online'},{status:'online'},{status:'online'},{status:'online'}]; // local cache
 
-// Printer names and colors — index 0=Leonardo, 1=Donatello, 2=Raphael, 3=Michelangelo
-// PRINTER_COLORS_ALPHA is the same colors but semi-transparent, used in the overview calendar
 const PRINTER_NAMES=['Leonardo','Donatello','Raphael','Michelangelo'];
 const PRINTER_COLORS=['#1a4a9c','#7b3fa0','#c0392b','#e07b00'];
 const PRINTER_COLORS_ALPHA=['rgba(26,74,156,0.5)','rgba(123,63,160,0.5)','rgba(192,57,43,0.5)','rgba(224,123,0,0.5)'];
-
-const calendars=[];          // will hold all 4 FullCalendar instances after initCalendars() runs
-let overviewCal=null;        // the combined overview calendar (separate from the 4 individual ones)
-const overviewToggles=[true,true,true,true]; // tracks which printers are visible on the overview — all on by default
+const calendars=[];
+let overviewCal=null;
+const overviewToggles=[true,true,true,true];
 
 // ── API HELPERS ──
-// authHeaders() — builds the request headers I need for every authenticated API call
-// The server checks the Authorization header to know who's making the request
 function authHeaders(){return{'Content-Type':'application/json','Authorization':'Bearer '+authToken};}
-
-// These four functions wrap fetch() for GET, POST, PUT, DELETE
-// They all throw an error if the response isn't OK, so I can catch it wherever I call them
 async function apiGet(url){const r=await fetch(url,{headers:authHeaders()});if(!r.ok)throw new Error(await r.text());return r.json();}
 async function apiPost(url,body){const r=await fetch(url,{method:'POST',headers:authHeaders(),body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json();}
 async function apiPut(url,body){const r=await fetch(url,{method:'PUT',headers:authHeaders(),body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json();}
 async function apiDelete(url){const r=await fetch(url,{method:'DELETE',headers:authHeaders()});if(!r.ok)throw new Error(await r.text());return r.json();}
 
+// ── PRINTER STATUS ──
+async function loadPrinterStatuses(){
+  try{
+    const data=await apiGet('/api/printers');
+    printerStatuses=data;
+    updatePrinterStatusBanners();
+    updateAllStats();
+  }catch(e){console.warn('Could not load printer statuses',e);}
+}
+
+function isPrinterOnline(idx){
+  return !printerStatuses[idx]||printerStatuses[idx].status==='online';
+}
+
+function updatePrinterStatusBanners(){
+  PRINTER_NAMES.forEach((_,i)=>{
+    const banner=document.getElementById(`printer-offline-banner-${i}`);
+    if(!banner)return;
+    const ps=printerStatuses[i];
+    if(!ps||ps.status==='online'){banner.innerHTML='';return;}
+    const icon=ps.status==='maintenance'?'🔧':'🚫';
+    const label=ps.status==='maintenance'?'Under Maintenance':'Offline';
+    const note=ps.note?` — ${ps.note}`:'';
+    banner.innerHTML=`<div class="printer-offline-banner"><span class="pob-icon">${icon}</span><div class="pob-text"><span class="pob-status">${PRINTER_NAMES[i]} is ${label}</span>${note}<br>Bookings are not available while this printer is unavailable.</div></div>`;
+  });
+}
+
 // ── BOOKINGS ──
-// loadBookings() — called once on startup to pull all existing reservations from the server
-// and add them to the correct calendar. If this fails, I show a toast warning but don't crash.
 async function loadBookings(){
   try{
     const data=await apiGet('/api/bookings');
     data.forEach(ev=>{
-      const i=ev.printer; // printer index (0-3)
-      if(!calendars[i])return; // skip if that calendar hasn't been set up yet (shouldn't happen)
+      const i=ev.printer;
+      if(!calendars[i])return;
       calendars[i].addEvent({id:ev.id,title:ev.owner,start:ev.start,end:ev.end,extendedProps:{type:'reservation',owner:ev.owner,id:ev.id}});
     });
   }catch(e){console.warn('Could not load bookings',e);toast('⚠ Could not load bookings from server.');}
 }
 
-// ── HISTORY (local) ──
-// I store deleted bookings in localStorage so they persist across sessions
-// getHistory() reads the array from storage, addToHistory() pushes a new entry to the front
+// ── HISTORY ──
 function getHistory(){try{return JSON.parse(localStorage.getItem('fablab_history')||'[]');}catch(e){return[];}}
 function addToHistory(entry){const h=getHistory();h.unshift(entry);localStorage.setItem('fablab_history',JSON.stringify(h));}
 
 // ── CSV EXPORT ──
-// exportWeekCSV() — builds a CSV file of all bookings in the current Mon-Fri week and downloads it
-// Each row = one booking: printer name, user, start time, end time, duration in minutes
 function exportWeekCSV(){
   const{monday,friday}=getWeekBounds();
-  const rows=[['Printer','User','Start','End','Duration (min)']]; // header row
+  const rows=[['Reservation ID','Printer','User','Start','End','Duration (min)']];
   calendars.forEach((cal,i)=>{
-    // only include reservations that overlap the current week
     cal.getEvents().filter(e=>e.extendedProps.type==='reservation').filter(e=>{const s=e.start,end=e.end||new Date(s.getTime()+30*60000);return end>=monday&&s<=friday;}).sort((a,b)=>a.start-b.start).forEach(e=>{
       const end=e.end||new Date(e.start.getTime()+30*60000);
-      rows.push([PRINTER_NAMES[i],e.extendedProps.owner,e.start.toLocaleString(),end.toLocaleString(),Math.round((end-e.start)/60000)]);
+      rows.push([e.id||'—',PRINTER_NAMES[i],e.extendedProps.owner,e.start.toLocaleString(),end.toLocaleString(),Math.round((end-e.start)/60000)]);
     });
   });
-  // convert the array of arrays to a properly escaped CSV string
   const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  // create a temporary download link and click it programmatically
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -715,12 +741,8 @@ function exportWeekCSV(){
 }
 
 // ── LOGIN ──
-// Listen for the button click and also allow pressing Enter in the PIN field
 document.getElementById('login-btn').addEventListener('click',doLogin);
 document.getElementById('login-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-
-// doLogin() — grabs the name and PIN from the form, sends them to /api/login
-// On success I get back a token and the user's info; I store those and call launchApp()
 async function doLogin(){
   const name=document.getElementById('login-name').value.trim();
   const pin=document.getElementById('login-pin').value.trim();
@@ -728,7 +750,7 @@ async function doLogin(){
   const btn=document.getElementById('login-btn');
   errEl.textContent='';
   if(!name||!pin){errEl.textContent='Please enter your name and PIN.';return;}
-  btn.disabled=true;btn.textContent='Signing in…'; // prevent double-clicks while waiting
+  btn.disabled=true;btn.textContent='Signing in…';
   try{
     const res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,pin})});
     const data=await res.json();
@@ -739,16 +761,13 @@ async function doLogin(){
   }catch(e){errEl.textContent='Could not reach server. Try again.';btn.disabled=false;btn.textContent='Sign In';}
 }
 
-// launchApp() — runs after a successful login to set up the whole UI
-// Fades out the login overlay, shows the main app, and initializes all the components
 function launchApp(){
   const ov=document.getElementById('login-overlay');
-  ov.classList.add('hidden');setTimeout(()=>ov.style.display='none',400); // wait for fade-out animation
+  ov.classList.add('hidden');setTimeout(()=>ov.style.display='none',400);
   document.getElementById('app').classList.add('visible');
   document.getElementById('user-name-display').textContent=currentUser.name;
   const chip=document.getElementById('user-role-display');
   chip.textContent=currentUser.role;chip.className='role-chip '+currentUser.role;
-  // only show History and Admin links in the sidebar if the user is an admin
   if(currentUser.role==='admin'){
     document.getElementById('nav-history').style.display='flex';
     document.getElementById('nav-admin').style.display='flex';
@@ -760,24 +779,18 @@ function launchApp(){
   initOverviewCalendar();
   initNav();
   initAdminPanel();
-  // hook up the export and clear history buttons on the history page
+  loadPrinterStatuses();
   document.getElementById('btn-export-csv').addEventListener('click',exportWeekCSV);
   document.getElementById('btn-clear-history').addEventListener('click',async()=>{
     const ok=await choiceModal({title:'Clear History',message:'Permanently delete all booking history?',confirmText:'Clear',danger:true});
     if(ok){localStorage.removeItem('fablab_history');renderHistory();toast('History cleared.');}
   });
-  // re-render the history table whenever the filter dropdowns change
   document.getElementById('history-filter-printer').addEventListener('change',renderHistory);
   document.getElementById('history-filter-status').addEventListener('change',renderHistory);
 }
 
 // ── NAVIGATION ──
-// initNav() — finds every element with a data-page attribute and adds a click listener
-// This covers both sidebar nav items and any other clickable things with data-page
 function initNav(){document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>navigateTo(el.dataset.page)));}
-
-// navigateTo() — switches which page is visible and updates the sidebar highlight
-// For schedule pages, I resize the calendar after a short delay so it renders correctly
 function navigateTo(pageId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+pageId).classList.add('active');
@@ -785,96 +798,81 @@ function navigateTo(pageId){
   document.querySelectorAll('.sidebar-printer-card').forEach(el=>el.classList.remove('active'));
   const activeEl=document.querySelector(`[data-page="${pageId}"]`);
   if(activeEl)activeEl.classList.add('active');
-  // FullCalendar needs a size update when its container becomes visible
   if(pageId.startsWith('schedule-')){const idx=parseInt(pageId.split('-')[1]);if(calendars[idx])setTimeout(()=>calendars[idx].updateSize(),60);}
   if(pageId==='overview')setTimeout(()=>{if(overviewCal)overviewCal.updateSize();refreshOverview();},80);
   if(pageId==='my-bookings')renderMyBookings();
   if(pageId==='history')renderHistory();
-  if(pageId==='admin')renderAdminUsers();
-  updateAllStats(); // refresh all the fullness bars and status badges whenever I change pages
+  if(pageId==='admin'){renderAdminUsers();renderAdminPrinterStatus();}
+  updateAllStats();
 }
 
 // ── FULLNESS ──
-// Total available booking minutes per week = 10 hours/day × 5 days × 60 min = 3000 min
-// I use this to calculate what percentage of the week each printer is booked up
 const AVAIL_MINS=10*60*5;
-
-// getWeekBounds() — returns the Monday 00:00 and Friday 23:59 of the current week
-// I use this to filter bookings so I only count ones that fall within the current week
 function getWeekBounds(){
   const now=new Date(),day=now.getDay();
   const monday=new Date(now);monday.setDate(now.getDate()-(day===0?6:day-1));monday.setHours(0,0,0,0);
   const friday=new Date(monday);friday.setDate(monday.getDate()+4);friday.setHours(23,59,59,999);
   return{monday,friday};
 }
-
-// calcFullness() — returns a 0-100 percentage of how booked a printer is this week
-// If the end time is missing I assume 30 minutes as a fallback
 function calcFullness(calIdx){
   if(!calendars[calIdx])return 0;
   const{monday,friday}=getWeekBounds();let bookedMins=0;
   calendars[calIdx].getEvents().filter(e=>e.extendedProps.type==='reservation').forEach(ev=>{
     const s=ev.start,e=ev.end||new Date(ev.start.getTime()+30*60000);
-    if(e<monday||s>friday)return; // skip bookings outside this week
-    // clamp to week boundaries in case a booking straddles midnight or the weekend
+    if(e<monday||s>friday)return;
     bookedMins+=(Math.min(e,friday)-Math.max(s,monday))/60000;
   });
   return Math.min(100,Math.round((bookedMins/AVAIL_MINS)*100));
 }
-
-// fillClass() — returns a CSS class name based on how full the printer is
-// green under 50%, gold 50-80%, red over 80%
 function fillClass(pct){return pct<50?'fill-low':pct<80?'fill-medium':'fill-high';}
-
-// updateAllStats() — refreshes all the status badges, fullness bars, and "next booking" text
-// across the dashboard cards, schedule page headers, and sidebar mini-cards
-// This runs on page nav and also on a 60-second timer set up in initCalendars()
 function updateAllStats(){
   const now=new Date();
   PRINTER_NAMES.forEach((_,i)=>{
+    const ps=printerStatuses[i];
+    const isOnline=!ps||ps.status==='online';
     const pct=calcFullness(i),fc=fillClass(pct);
-    // update dashboard card fullness bar and percentage text
     const df=document.getElementById(`dash-fill-${i}`),dp=document.getElementById(`dash-pct-${i}`);
     if(df){df.style.width=pct+'%';df.className='fullness-fill '+fc;}
     if(dp)dp.textContent=pct+'%';
-    // check if any reservation is happening right now on this printer
     const events=calendars[i]?calendars[i].getEvents().filter(e=>e.extendedProps.type==='reservation'):[];
     const busyNow=events.find(e=>e.start<=now&&(e.end||new Date(e.start.getTime()+30*60000))>now);
-    // update the Available/In Use badge and the "free at X" or "next booking at X" line
     const badge=document.getElementById(`dash-badge-${i}`),nextEl=document.getElementById(`dash-next-${i}`);
-    if(badge){badge.textContent=busyNow?'In Use':'Available';badge.className='status-badge '+(busyNow?'busy':'free');}
+    if(badge){
+      if(!isOnline){badge.textContent=ps.status==='maintenance'?'Maintenance':'Offline';badge.className='status-badge '+(ps.status==='maintenance'?'maintenance':'offline');}
+      else{badge.textContent=busyNow?'In Use':'Available';badge.className='status-badge '+(busyNow?'busy':'free');}
+    }
     if(nextEl){
-      if(busyNow){const freeAt=busyNow.end||new Date(busyNow.start.getTime()+30*60000);nextEl.textContent=`Free at ${freeAt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;}
+      if(!isOnline){nextEl.textContent=ps.note||'';}
+      else if(busyNow){const freeAt=busyNow.end||new Date(busyNow.start.getTime()+30*60000);nextEl.textContent=`Free at ${freeAt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;}
       else{const upcoming=events.filter(e=>e.start>now).sort((a,b)=>a.start-b.start)[0];nextEl.textContent=upcoming?`Next: ${upcoming.start.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`:'No bookings today';}
     }
-    // update the mini fullness bar shown at the top of each individual printer schedule page
     const mf=document.getElementById(`mini-fill-${i}`),mp=document.getElementById(`mini-pct-${i}`);
     if(mf){mf.style.width=pct+'%';mf.className='mini-fill '+fc;}
     if(mp)mp.textContent=pct+'% full this week';
-    // update the sidebar mini-card status pill and colored progress bar
     const spcStatus=document.getElementById(`spc-status-${i}`),spcBar=document.getElementById(`spc-bar-${i}`);
-    if(spcStatus){spcStatus.textContent=busyNow?'In Use':'Free';spcStatus.className='spc-status '+(busyNow?'busy':'free');}
+    if(spcStatus){
+      if(!isOnline){spcStatus.textContent=ps.status==='maintenance'?'Maint.':'Offline';spcStatus.className='spc-status '+(ps.status==='maintenance'?'maintenance':'offline');}
+      else{spcStatus.textContent=busyNow?'In Use':'Free';spcStatus.className='spc-status '+(busyNow?'busy':'free');}
+    }
     if(spcBar){spcBar.style.width=pct+'%';spcBar.style.background=PRINTER_COLORS[i];}
+    // gray out dashboard card if printer down
+    const dashCard=document.querySelector(`#dash-grid .printer-card:nth-child(${i+1})`);
+    if(dashCard)dashCard.classList.toggle('printer-down',!isOnline);
   });
 }
 
 // ── DASHBOARD CARDS ──
-// buildDashCards() — creates the 4 printer cards on the dashboard dynamically using JS
-// Each card has a colored top border, a fullness bar, a status badge, and a "view schedule" CTA
 function buildDashCards(){
   const grid=document.getElementById('dash-grid');
   PRINTER_NAMES.forEach((name,i)=>{
     const card=document.createElement('div');card.className='printer-card';
-    card.style.borderTopColor=PRINTER_COLORS[i]; // TMNT color for each printer
+    card.style.borderTopColor=PRINTER_COLORS[i];
     card.innerHTML=`<div class="card-top"><div class="card-name">${name}</div><div class="status-badge free" id="dash-badge-${i}">Available</div></div><div class="fullness-label"><span class="fl-text">Weekly capacity</span><span class="fl-pct" id="dash-pct-${i}">0%</span></div><div class="fullness-track"><div class="fullness-fill fill-low" id="dash-fill-${i}" style="width:0%"></div></div><div class="card-next" id="dash-next-${i}">—</div><div class="card-cta">View schedule →</div>`;
     card.addEventListener('click',()=>navigateTo('schedule-'+i));grid.appendChild(card);
   });
 }
 
 // ── SIDEBAR PRINTER CARDS ──
-// buildSidebarPrinterCards() — adds two things to the sidebar:
-//   1. Simple nav links (Leonardo, Donatello, etc.) with colored dots
-//   2. Mini status cards showing Free/In Use and a small fullness bar
 function buildSidebarPrinterCards(){
   const container=document.getElementById('sidebar-printer-cards');
   PRINTER_NAMES.forEach((name,i)=>{
@@ -885,69 +883,49 @@ function buildSidebarPrinterCards(){
   });
   const infoDiv=document.createElement('div');infoDiv.className='sidebar-printer-info';
   PRINTER_NAMES.forEach((name,i)=>{
-    const card=document.createElement('div');card.className='sidebar-printer-card';
-    card.dataset.page=`schedule-${i}`;
+    const card=document.createElement('div');card.className='sidebar-printer-card';card.dataset.page=`schedule-${i}`;
     card.innerHTML=`<div class="spc-top"><div class="spc-name">${name}</div><div class="spc-status free" id="spc-status-${i}">Free</div></div><div class="spc-bar-track"><div class="spc-bar-fill" id="spc-bar-${i}" style="width:0%;background:${PRINTER_COLORS[i]}"></div></div>`;
-    card.addEventListener('click',()=>navigateTo(`schedule-${i}`));
-    infoDiv.appendChild(card);
+    card.addEventListener('click',()=>navigateTo(`schedule-${i}`));infoDiv.appendChild(card);
   });
   container.appendChild(infoDiv);
 }
 
 // ── PRINTER SPEC CARDS ──
-// buildPrinterSpecCards() — builds the spec cards on the Rules & Info page
-// All 4 printers are identical X1 Carbon units so the specs are the same for each
 function buildPrinterSpecCards(){
   const grid=document.getElementById('printer-spec-cards');
   PRINTER_NAMES.forEach((name,i)=>{
     const card=document.createElement('div');card.className='printer-spec-card';
     card.style.borderTopColor=PRINTER_COLORS[i];
-    card.innerHTML=`
-      <div class="psc-header"><div class="psc-dot" style="background:${PRINTER_COLORS[i]}"></div><div class="psc-name">${name}</div></div>
-      <div class="spec-row"><div class="spec-label">Model</div><div class="spec-value">Bambu Lab X1 Carbon</div></div>
-      <div class="spec-row"><div class="spec-label">Build Volume</div><div class="spec-value">10.07″ × 10.07″ × 10.07″ (256 × 256 × 256 mm)</div></div>
-      <div class="spec-row"><div class="spec-label">Materials</div><div class="spec-value">PLA, Support for PLA, PLA-CF</div></div>
-      <div class="spec-row"><div class="spec-label">Nozzle</div><div class="spec-value">0.4 mm hardened steel</div></div>
-      <div class="spec-row"><div class="spec-label">Plate Type</div><div class="spec-value">Bambu Cool Plate (installed)</div></div>
-      <div class="spec-row"><div class="spec-label">Max Speed</div><div class="spec-value">500 mm/s</div></div>
-    `;
+    card.innerHTML=`<div class="psc-header"><div class="psc-dot" style="background:${PRINTER_COLORS[i]}"></div><div class="psc-name">${name}</div></div><div class="spec-row"><div class="spec-label">Model</div><div class="spec-value">Bambu Lab X1 Carbon</div></div><div class="spec-row"><div class="spec-label">Build Volume</div><div class="spec-value">10.07″ × 10.07″ × 10.07″ (256 × 256 × 256 mm)</div></div><div class="spec-row"><div class="spec-label">Materials</div><div class="spec-value">PLA, Support for PLA, PLA-CF</div></div><div class="spec-row"><div class="spec-label">Nozzle</div><div class="spec-value">0.4 mm hardened steel</div></div><div class="spec-row"><div class="spec-label">Plate Type</div><div class="spec-value">Bambu Cool Plate (installed)</div></div><div class="spec-row"><div class="spec-label">Max Speed</div><div class="spec-value">500 mm/s</div></div>`;
     grid.appendChild(card);
   });
 }
 
 // ── MY BOOKINGS ──
-// renderMyBookings() — splits all calendars' events into "upcoming" and "past" for the current user
-// Upcoming = starts in the future, Past = already started
 function renderMyBookings(){
-  const now=new Date();
-  let upcoming=[],past=[];
+  const now=new Date();let upcoming=[],past=[];
   calendars.forEach((cal,i)=>{
-    // only grab events that belong to the logged-in user
     cal.getEvents().filter(e=>e.extendedProps.type==='reservation'&&e.extendedProps.owner===currentUser.name).forEach(e=>{
       if(e.start>=now)upcoming.push({event:e,printerIdx:i});
       else past.push({event:e,printerIdx:i});
     });
   });
-  upcoming.sort((a,b)=>a.event.start-b.event.start);       // soonest first
-  past.sort((a,b)=>b.event.start-a.event.start);           // most recent first
+  upcoming.sort((a,b)=>a.event.start-b.event.start);
+  past.sort((a,b)=>b.event.start-a.event.start);
   renderBookingList('bookings-upcoming-list',upcoming,false);
   renderBookingList('bookings-past-list',past,true);
 }
-
-// renderBookingList() — builds the HTML rows for either the upcoming or past bookings list
-// isPast=true hides the delete button and grays out the row
 function renderBookingList(containerId,bookings,isPast){
   const container=document.getElementById(containerId);
-  if(!bookings.length){container.innerHTML='<div class="bookings-empty"><div class="big-icon">📋</div><p>'+(isPast?'No past bookings.':'No upcoming bookings. Head to a printer page to book a slot.')+'</p></div>';return;}
+  if(!bookings.length){container.innerHTML='<div class="bookings-empty"><div class="big-icon">📋</div><p>'+(isPast?'No past bookings.':'No upcoming bookings.')+'</p></div>';return;}
   const list=document.createElement('div');list.className='booking-list';
   bookings.forEach(({event:ev,printerIdx:pi})=>{
     const row=document.createElement('div');row.className='booking-row'+(isPast?' past':'');
     const start=ev.start.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
     const end=ev.end?ev.end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';
     const mins=ev.end?Math.round((ev.end-ev.start)/60000):'?';
-    row.innerHTML=`<div class="br-dot" style="background:${PRINTER_COLORS[pi]}"></div><div class="br-info"><div class="br-printer">${PRINTER_NAMES[pi]}</div><div class="br-time">${start} – ${end} (${mins} min)</div></div>${isPast?'':'<button class="br-delete">Delete</button>'}`;
+    row.innerHTML=`<div class="br-dot" style="background:${PRINTER_COLORS[pi]}"></div><div class="br-info"><div class="br-printer">${PRINTER_NAMES[pi]}</div><div class="br-time">${start} – ${end} (${mins} min)</div><div class="br-id">${ev.id||''}</div></div>${isPast?'':'<button class="br-delete">Delete</button>'}`;
     if(!isPast){
-      // delete button: confirm → call API → remove from calendar → log to history
       row.querySelector('.br-delete').addEventListener('click',async()=>{
         const confirmed=await deleteModal(`your reservation on ${PRINTER_NAMES[pi]}`);
         if(confirmed){
@@ -965,54 +943,42 @@ function renderBookingList(containerId,bookings,isPast){
 }
 
 // ── HISTORY ──
-// renderHistory() — builds the admin history table from two sources:
-//   1. Currently active events still on the calendars
-//   2. Deleted events stored in localStorage
-// The filters at the top of the page let you narrow by printer and active/deleted status
 function renderHistory(){
   const container=document.getElementById('history-container');
   const filterPrinter=document.getElementById('history-filter-printer').value;
   const filterStatus=document.getElementById('history-filter-status').value;
   let rows=[];
-  // pull active bookings straight from the live calendars
   calendars.forEach((cal,i)=>{
     cal.getEvents().filter(e=>e.extendedProps.type==='reservation').forEach(ev=>{
-      rows.push({printer:PRINTER_NAMES[i],printerIdx:i,owner:ev.extendedProps.owner,start:ev.start.toISOString(),end:ev.end?ev.end.toISOString():null,status:'active'});
+      rows.push({id:ev.id,printer:PRINTER_NAMES[i],printerIdx:i,owner:ev.extendedProps.owner,start:ev.start.toISOString(),end:ev.end?ev.end.toISOString():null,status:'active'});
     });
   });
-  // also include the deleted bookings saved in localStorage
   getHistory().forEach(h=>rows.push({...h,status:h.status||'deleted'}));
-  // apply the dropdown filters
   if(filterPrinter!=='all')rows=rows.filter(r=>r.printer===PRINTER_NAMES[parseInt(filterPrinter)]);
   if(filterStatus!=='all')rows=rows.filter(r=>r.status===filterStatus);
-  rows.sort((a,b)=>new Date(b.start)-new Date(a.start)); // newest first
+  rows.sort((a,b)=>new Date(b.start)-new Date(a.start));
   if(!rows.length){container.innerHTML='<div class="history-empty">No records found.</div>';return;}
-  // build the table
   const table=document.createElement('table');table.className='history-table';
-  table.innerHTML=`<thead><tr><th>Printer</th><th>User</th><th>Date &amp; Start</th><th>End</th><th>Duration</th><th>Status</th></tr></thead>`;
+  table.innerHTML=`<thead><tr><th>ID</th><th>Printer</th><th>User</th><th>Date &amp; Start</th><th>End</th><th>Duration</th><th>Status</th></tr></thead>`;
   const tbody=document.createElement('tbody');
   rows.forEach(h=>{
     const start=new Date(h.start),end=h.end?new Date(h.end):null;
     const mins=end?Math.round((end-start)/60000):'?';
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${PRINTER_COLORS[PRINTER_NAMES.indexOf(h.printer)]};flex-shrink:0"></span>${h.printer}</span></td><td>${h.owner}</td><td>${start.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>${end?end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'}</td><td>${mins} min</td><td><span class="history-tag ${h.status}">${h.status}</span></td>`;
+    tr.innerHTML=`<td style="font-family:monospace;font-size:.78rem">${h.id||'—'}</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${PRINTER_COLORS[PRINTER_NAMES.indexOf(h.printer)]};flex-shrink:0"></span>${h.printer}</span></td><td>${h.owner}</td><td>${start.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>${end?end.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'}</td><td>${mins} min</td><td><span class="history-tag ${h.status}">${h.status}</span></td>`;
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);container.innerHTML='';container.appendChild(table);
 }
 
 // ── ADMIN PANEL ──
-// initAdminPanel() — wires up the "Clear All Bookings" and "Add User" buttons
-// Only runs if the user is an admin (the nav links are hidden for regular users)
 function initAdminPanel(){
   document.getElementById('btn-clear-bookings').addEventListener('click',async()=>{
     const ok=await choiceModal({title:'Clear All Bookings',message:'This will permanently delete ALL bookings from all printers. This cannot be undone.',confirmText:'Clear Everything',danger:true});
     if(ok){
       try{
-        // fetch all bookings from the server and delete each one individually
         const data=await apiGet('/api/bookings');
         for(const ev of data){await apiDelete('/api/bookings/'+ev.id);}
-        // also remove them from the local FullCalendar instances so the UI updates immediately
         calendars.forEach(cal=>cal.getEvents().filter(e=>e.extendedProps.type==='reservation').forEach(e=>e.remove()));
         updateAllStats();refreshOverview();toast('All bookings cleared.');
       }catch(e){toast('⚠ Error clearing bookings.');}
@@ -1020,36 +986,35 @@ function initAdminPanel(){
   });
   document.getElementById('btn-add-user').addEventListener('click',async()=>{
     const name=document.getElementById('new-user-name').value.trim();
+    const email=document.getElementById('new-user-email').value.trim();
     const pin=document.getElementById('new-user-pin').value.trim();
     const role=document.getElementById('new-user-role').value;
     if(!name||!pin){toast('Name and PIN required.');return;}
     try{
-      await apiPost('/api/users',{name,pin,role});
-      // clear the form fields after a successful add
+      await apiPost('/api/users',{name,email,pin,role});
       document.getElementById('new-user-name').value='';
+      document.getElementById('new-user-email').value='';
       document.getElementById('new-user-pin').value='';
       toast('✓ User added!');renderAdminUsers();
     }catch(e){toast('⚠ Could not add user. May already exist.');}
   });
 }
 
-// renderAdminUsers() — fetches the current user list from the server and builds the table
-// Each row has a Remove button that calls deleteUser()
 async function renderAdminUsers(){
   const el=document.getElementById('admin-current-users');
-  el.innerHTML='<tr><td colspan="3" style="padding:10px;color:var(--muted)">Loading…</td></tr>';
+  el.innerHTML='<tr><td colspan="4" style="padding:10px;color:var(--muted)">Loading…</td></tr>';
   try{
     const users=await apiGet('/api/users');
     el.innerHTML=users.map(u=>`
       <tr>
         <td style="padding:8px 12px">${u.name}</td>
+        <td style="padding:8px 12px;color:var(--muted);font-size:.84rem">${u.email||'—'}</td>
         <td style="padding:8px 12px"><span class="role-chip ${u.role}">${u.role}</span></td>
         <td style="padding:8px 12px"><button class="br-delete" onclick="deleteUser(${u.id},'${u.name.replace(/'/g,"\\'")}')">Remove</button></td>
       </tr>`).join('');
-  }catch(e){el.innerHTML='<tr><td colspan="3" style="padding:10px;color:var(--red)">Could not load users.</td></tr>';}
+  }catch(e){el.innerHTML='<tr><td colspan="4" style="padding:10px;color:var(--red)">Could not load users.</td></tr>';}
 }
 
-// deleteUser() — confirms then calls the API to remove a user by their ID
 async function deleteUser(id,name){
   const ok=await choiceModal({title:'Remove User',message:`Remove ${name}? They will no longer be able to log in.`,confirmText:'Remove',danger:true});
   if(ok){
@@ -1058,139 +1023,129 @@ async function deleteUser(id,name){
   }
 }
 
+// ── ADMIN PRINTER STATUS ──
+async function renderAdminPrinterStatus(){
+  const grid=document.getElementById('admin-printer-status-grid');
+  if(!grid)return;
+  try{
+    const printers=await apiGet('/api/printers');
+    grid.innerHTML='';
+    printers.forEach(p=>{
+      const i=p.id;
+      const card=document.createElement('div');card.className='printer-status-card';
+      card.innerHTML=`
+        <div class="pscard-top">
+          <div class="pscard-name"><span class="pscard-dot" style="background:${PRINTER_COLORS[i]}"></span>${p.name}</div>
+          <span class="pscard-badge ${p.status}">${p.status}</span>
+        </div>
+        <div class="pscard-controls">
+          <select id="pstatus-select-${i}">
+            <option value="online" ${p.status==='online'?'selected':''}>Online</option>
+            <option value="maintenance" ${p.status==='maintenance'?'selected':''}>Maintenance</option>
+            <option value="offline" ${p.status==='offline'?'selected':''}>Offline</option>
+          </select>
+          <button class="btn-action" style="padding:5px 12px;font-size:.8rem" onclick="savePrinterStatus(${i})">Save</button>
+        </div>
+        <input class="pscard-note" id="pstatus-note-${i}" type="text" placeholder="Optional note (e.g. jammed extruder)" value="${p.note||''}"/>
+      `;
+      grid.appendChild(card);
+    });
+  }catch(e){grid.innerHTML='<p style="color:var(--red);font-size:.87rem">Could not load printer statuses.</p>';}
+}
+
+async function savePrinterStatus(idx){
+  const status=document.getElementById(`pstatus-select-${idx}`).value;
+  const note=document.getElementById(`pstatus-note-${idx}`).value.trim();
+  try{
+    await apiPut(`/api/printers/${idx}`,{status,note});
+    toast(`✓ ${PRINTER_NAMES[idx]} set to ${status}`);
+    await loadPrinterStatuses(); // refresh local cache + banners
+    renderAdminPrinterStatus();
+  }catch(e){toast('⚠ Could not update printer status.');}
+}
+
 // ── OVERVIEW CALENDAR ──
-// initOverviewCalendar() — sets up the combined read-only calendar that shows all 4 printers at once
-// Clicking an event shows a toast with who booked it and on which printer
 function initOverviewCalendar(){
   const el=document.getElementById('cal-overview');
   overviewCal=new FullCalendar.Calendar(el,{
-    initialView:'timeGridWeek',selectable:false,editable:false, // read-only — no clicking/dragging to book
+    initialView:'timeGridWeek',selectable:false,editable:false,
     height:'auto',allDaySlot:false,slotMinTime:'08:00:00',slotMaxTime:'18:00:00',
     hiddenDays:[0,6],nowIndicator:true,
     headerToolbar:{left:'prev,next today',center:'title',right:'timeGridWeek,timeGridDay'},
     events:[],
-    eventClick:function(info){
-      const pi=info.event.extendedProps.printerIdx;
-      toast(`${info.event.extendedProps.owner} — ${PRINTER_NAMES[pi]}`);
-    }
+    eventClick:function(info){const pi=info.event.extendedProps.printerIdx;toast(`${info.event.extendedProps.owner} — ${PRINTER_NAMES[pi]}`);}
   });
   overviewCal.render();
-  buildOverviewToggles(); // create the toggle buttons for each printer
+  buildOverviewToggles();
 }
-
-// buildOverviewToggles() — creates the colored toggle buttons above the overview calendar
-// Clicking one flips its visibility in the overviewToggles array and refreshes the calendar
 function buildOverviewToggles(){
   const container=document.getElementById('overview-toggles');
   PRINTER_NAMES.forEach((name,i)=>{
     const btn=document.createElement('button');btn.className='toggle-btn';btn.id=`toggle-${i}`;
     btn.style.background=PRINTER_COLORS_ALPHA[i];btn.style.borderColor=PRINTER_COLORS[i];btn.style.color=PRINTER_COLORS[i];
     btn.innerHTML=`<span class="toggle-dot" style="background:${PRINTER_COLORS[i]}"></span>${name}`;
-    btn.addEventListener('click',()=>{
-      overviewToggles[i]=!overviewToggles[i];
-      btn.classList.toggle('off',!overviewToggles[i]); // 'off' class fades the button out visually
-      refreshOverview();
-    });
+    btn.addEventListener('click',()=>{overviewToggles[i]=!overviewToggles[i];btn.classList.toggle('off',!overviewToggles[i]);refreshOverview();});
     container.appendChild(btn);
   });
 }
-
-// refreshOverview() — clears and redraws the overview calendar based on the current toggle states
-// Called whenever a toggle is clicked or the overview page is navigated to
 function refreshOverview(){
   if(!overviewCal)return;
-  overviewCal.getEvents().forEach(e=>e.remove()); // wipe everything first
+  overviewCal.getEvents().forEach(e=>e.remove());
   calendars.forEach((cal,i)=>{
-    if(!overviewToggles[i])return; // skip printers that are toggled off
+    if(!overviewToggles[i])return;
     cal.getEvents().filter(e=>e.extendedProps.type==='reservation').forEach(ev=>{
-      // use semi-transparent colors so overlapping events are visible
-      overviewCal.addEvent({
-        title:ev.extendedProps.owner,start:ev.start,end:ev.end,
-        backgroundColor:PRINTER_COLORS_ALPHA[i],borderColor:PRINTER_COLORS[i],textColor:PRINTER_COLORS[i],
-        extendedProps:{printerIdx:i,owner:ev.extendedProps.owner}
-      });
+      overviewCal.addEvent({title:ev.extendedProps.owner,start:ev.start,end:ev.end,backgroundColor:PRINTER_COLORS_ALPHA[i],borderColor:PRINTER_COLORS[i],textColor:PRINTER_COLORS[i],extendedProps:{printerIdx:i,owner:ev.extendedProps.owner}});
     });
   });
 }
 
 // ── CALENDARS ──
-// makeCalendar() — creates one FullCalendar instance for a single printer
-// Handles all the user interactions: selecting a slot, dragging/resizing events, clicking to delete
 function makeCalendar(idx){
   const el=document.getElementById('cal-'+idx),printerName=PRINTER_NAMES[idx];
-
-  // hasConflict() — checks if a proposed time range overlaps with any OTHER user's bookings
-  // Admins bypass this check (they can book over anything)
-  // Own bookings are skipped so you can move/resize your own without it blocking itself
   function hasConflict(skipEv,start,end){
     return calendars[idx].getEvents().some(ev=>{
       if(ev===skipEv||ev.extendedProps.type!=='reservation')return false;
-      if(currentUser.role==='admin')return false; // admins ignore conflicts
+      if(currentUser.role==='admin')return false;
       const eS=ev.start,eE=ev.end||new Date(ev.start.getTime()+30*60000);
-      if(ev.extendedProps.owner!==currentUser.name)return start<eE&&end>eS; // overlap check
+      if(ev.extendedProps.owner!==currentUser.name)return start<eE&&end>eS;
       return false;
     });
   }
-
   const cal=new FullCalendar.Calendar(el,{
     initialView:'timeGridWeek',
-    selectable:currentUser.role!=='read', // read-only users can't click to select
-    editable:currentUser.role!=='read',   // read-only users can't drag events
+    selectable:currentUser.role!=='read',
+    editable:currentUser.role!=='read',
     eventResizableFromStart:true,
-    height:'auto',allDaySlot:false,
-    slotMinTime:'08:00:00',slotMaxTime:'18:00:00',
-    hiddenDays:[0,6], // hide Saturday and Sunday
-    nowIndicator:true,
+    height:'auto',allDaySlot:false,slotMinTime:'08:00:00',slotMaxTime:'18:00:00',
+    hiddenDays:[0,6],nowIndicator:true,
     headerToolbar:{left:'prev,next today',center:'title',right:'timeGridWeek,timeGridDay'},
     events:[],
-
-    // select: fires when the user clicks or drags on an empty slot to create a new booking
     select:async function(info){
       if(currentUser.role==='read'){toast('Read-only access.');return;}
+      if(!isPrinterOnline(idx)){toast(`⚠ ${printerName} is currently unavailable.`);return;}
       const timeStr=info.start.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      const mins=await durationModal(printerName,timeStr); // ask how long the print will take
-      if(!mins)return; // user cancelled the modal
+      const mins=await durationModal(printerName,timeStr);
+      if(!mins)return;
       const end=new Date(info.start.getTime()+mins*60000);
       if(hasConflict(null,info.start,end)){toast('⚠ That slot conflicts with an existing booking.');return;}
-      // generate a unique ID — use crypto.randomUUID if available, otherwise a timestamp+random fallback
-      const id=(typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2));
       try{
-        await apiPost('/api/bookings',{id,printer:idx,owner:currentUser.name,title:currentUser.name,start:info.start.toISOString(),end:end.toISOString()});
+        const result=await apiPost('/api/bookings',{printer:idx,owner:currentUser.name,title:currentUser.name,start:info.start.toISOString(),end:end.toISOString()});
+        const id=result.id;
         cal.addEvent({id,title:currentUser.name,start:info.start,end,extendedProps:{type:'reservation',owner:currentUser.name,id}});
-        toast(`✓ Booked ${printerName} for ${mins} min`);updateAllStats();refreshOverview();
+        toast(`✓ Booked ${printerName} · ${id}`);updateAllStats();refreshOverview();
       }catch(e){toast('⚠ Could not save booking.');}
     },
-
-    // eventDrop: fires when someone drags a booking to a new time slot
     eventDrop:async function(info){
       const ev=info.event;
       if(currentUser.role==='read'){info.revert();return;}
       if(currentUser.role!=='admin'&&ev.extendedProps.owner!==currentUser.name){toast('You can only move your own reservations.');info.revert();return;}
-      const end=ev.end||new Date(ev.start.getTime()+30*60000);
-      // if there's a conflict, ask if they want to move anyway (admin-style override)
+      let end=ev.end||new Date(ev.start.getTime()+30*60000);
       if(hasConflict(ev,ev.start,end)){const ok=await choiceModal({title:'Conflict',message:'This overlaps another booking. Move anyway?',confirmText:'Move Anyway',cancelText:'Undo'});if(!ok){info.revert();return;}}
-      try{
-        await apiPut('/api/bookings/'+ev.extendedProps.id,{start:ev.start.toISOString(),end:end.toISOString()});
-        toast('Reservation moved.');updateAllStats();refreshOverview();
-      }catch(e){info.revert();toast('⚠ Could not save move.');}
-    },
-
-    // eventResize: fires when someone drags the edge of a booking to make it longer or shorter
-    eventResize:async function(info){
-      const ev=info.event;
-      if(currentUser.role==='read'){info.revert();return;}
-      if(currentUser.role!=='admin'&&ev.extendedProps.owner!==currentUser.name){toast('You can only resize your own reservations.');info.revert();return;}
-      const end=ev.end||new Date(ev.start.getTime()+30*60000);
+      end=ev.end||new Date(ev.start.getTime()+30*60000);
       if(hasConflict(ev,ev.start,end)){const ok=await choiceModal({title:'Conflict',message:'This resize overlaps another booking. Keep it?',confirmText:'Keep',cancelText:'Undo'});if(!ok){info.revert();return;}}
-      try{
-        await apiPut('/api/bookings/'+ev.extendedProps.id,{start:ev.start.toISOString(),end:end.toISOString()});
-        toast('Reservation updated.');updateAllStats();refreshOverview();
-      }catch(e){info.revert();toast('⚠ Could not save resize.');}
+      try{await apiPut('/api/bookings/'+ev.extendedProps.id,{start:ev.start.toISOString(),end:end.toISOString()});toast('Reservation updated.');updateAllStats();refreshOverview();}
+      catch(e){info.revert();toast('⚠ Could not save resize.');}
     },
-
-    // eventClick: fires when someone clicks on an existing event
-    // Read-only users just see a toast. Regular users can only delete their own.
-    // Admins can delete anyone's booking.
     eventClick:async function(info){
       const ev=info.event;
       if(currentUser.role==='read'){toast(`Booked by ${ev.extendedProps.owner}`);return;}
@@ -1199,8 +1154,7 @@ function makeCalendar(idx){
       if(confirmed){
         try{
           await apiDelete('/api/bookings/'+ev.extendedProps.id);
-          // log this deletion to localStorage history before removing from the calendar
-          addToHistory({printer:printerName,owner:ev.extendedProps.owner,start:ev.start.toISOString(),end:ev.end?ev.end.toISOString():null,status:'deleted',deletedAt:new Date().toISOString()});
+          addToHistory({id:ev.id,printer:printerName,owner:ev.extendedProps.owner,start:ev.start.toISOString(),end:ev.end?ev.end.toISOString():null,status:'deleted',deletedAt:new Date().toISOString()});
           ev.remove();toast('Deleted.');updateAllStats();refreshOverview();
         }catch(e){toast('⚠ Could not delete booking.');}
       }
@@ -1208,16 +1162,9 @@ function makeCalendar(idx){
   });
   cal.render();return cal;
 }
-
-// initCalendars() — creates all 4 printer calendars and starts the auto-refresh timer
-// loadBookings() pulls existing reservations from the server after the calendars are ready
-// setInterval runs updateAllStats every 60 seconds so "free at X" times stay accurate
 function initCalendars(){
   for(let i=0;i<4;i++)calendars.push(makeCalendar(i));
-  loadBookings();
-  updateAllStats();
-  setInterval(updateAllStats,60000); // refresh status every minute
-}
-</script>
+  loadBookings();updateAllStats();setInterval(updateAllStats,60000);
+}</script>
 </body>
 </html>
