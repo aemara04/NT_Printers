@@ -1,4 +1,8 @@
 # UVM FabLab 3D Printer Scheduler
+# To visit the active site:
+It can be found at: https://fablab.w3.uvm.edu
+To explore the site use a general vistor account (name `github`, PIN `0319`)
+
 
 A web app built for the [UVM SEED Program](https://www.uvm.edu/seed) to manage student access to self-serve 3D printers in the UVM FabLab. It handles training certification tracking, printer reservations, and user management, and is deployed on UVM's Silk shared hosting following [ETS documentation](https://silk.uvm.edu/manual/nodejs/#web-applications).
 
@@ -39,7 +43,7 @@ After completing in-person training, an admin activates their account in this sy
 
 Users are added by an admin through the web interface. You need a name, PIN, and role. Email is optional. Names are matched case-insensitively with spaces ignored, so "Anne Mara" and "annemara" will both work at login.
 
-A default admin account (name `Admin`, PIN `1234`) is created on first run. Change the PIN immediately.
+A default admin account (name `Admin`, PIN `1234`) is created on first run. Change the PIN immediately. Util 
 
 ## Printers
 
