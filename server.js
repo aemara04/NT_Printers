@@ -1,7 +1,5 @@
-/**
- * UVM FabLab — 3D Printer Scheduler
- * Backend: Express + better-sqlite3 + bcrypt + JWT
- */
+// UVM FabLab 3D Printer Scheduler
+// Backend using Express, better-sqlite3, bcrypt, and JWT
 
 const express   = require('express');
 const Database  = require('better-sqlite3');
@@ -13,11 +11,11 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'fablab-secret-change-in-production';
 
-// ── Middleware ─────────────────────────────────────────────────
+// middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── SQLite setup ───────────────────────────────────────────────
+// connect to sqlite database
 const db = new Database(path.join(__dirname, 'data', 'bookings.db'));
 db.exec(`
   CREATE TABLE IF NOT EXISTS bookings (
@@ -46,7 +44,7 @@ db.exec(`
   );
 `);
 
-// ── Seed printers if empty ─────────────────────────────────────
+// add printers on first run if the table is empty
 const printerCount = db.prepare('SELECT COUNT(*) as c FROM printers').get();
 if (printerCount.c === 0) {
   const names = ['Leonardo','Donatello','Raphael','Michelangelo'];
@@ -55,15 +53,15 @@ if (printerCount.c === 0) {
   });
 }
 
-// ── Seed default admin if no users ────────────────────────────
+// create a default admin account on first run - change the PIN immediately
 const userCount = db.prepare('SELECT COUNT(*) as c FROM users').get();
 if (userCount.c === 0) {
   const hash = bcrypt.hashSync('1234', 10);
   db.prepare('INSERT INTO users (name, pin_hash, role) VALUES (?, ?, ?)').run('Admin', hash, 'admin');
-  console.log('✓ Default admin created: name="Admin" pin="1234" — change this immediately!');
+  console.log('Default admin created: name="Admin" pin="1234" - change this immediately!');
 }
 
-// ── Auth middleware ────────────────────────────────────────────
+// check for a valid JWT in the authorization header
 function requireAuth(req, res, next) {
   const header = req.headers['authorization'];
   if (!header || !header.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
@@ -75,6 +73,7 @@ function requireAuth(req, res, next) {
   }
 }
 
+// same as requireAuth but also checks that the user is an admin
 function requireAdmin(req, res, next) {
   requireAuth(req, res, () => {
     if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
@@ -82,26 +81,24 @@ function requireAdmin(req, res, next) {
   });
 }
 
-// ── Smart Reservation ID ───────────────────────────────────────
-// Format: FBL-{base36 timestamp}-{printerInitial}{checksum}
-// e.g.  FBL-K3X9M-L7
+// generates a reservation ID in the format FBL-{base36 timestamp}-{printerInitial}{checksum}
+// for example: FBL-K3X9M-L7
 function makeReservationId(printerIdx, startISO) {
   const PRINTER_INITIALS = ['L','D','R','M'];
   const ts = new Date(startISO).getTime();
   const b36 = ts.toString(36).toUpperCase().slice(-5); // last 5 chars of base36 timestamp
   const initial = PRINTER_INITIALS[printerIdx] || 'X';
-  // checksum: sum of charCodes mod 36, mapped to alphanumeric
+  // checksum is sum of char codes mod 36, mapped to alphanumeric
   const raw = b36 + initial;
   const checksum = raw.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 36;
-  const checksumChar = checksum < 10 ? String(checksum) : String.fromCharCode(55 + checksum); // 0-9 or A-Z
+  const checksumChar = checksum < 10 ? String(checksum) : String.fromCharCode(55 + checksum);
   return `FBL-${b36}-${initial}${checksumChar}`;
 }
 
-// ── Login ──────────────────────────────────────────────────────
+// login - matches name case-insensitively and ignores spaces
 app.post('/api/login', (req, res) => {
   let { name, pin } = req.body;
   if (!name || !pin) return res.status(400).json({ error: 'Name and PIN required.' });
-  // fuzzy: strip all spaces and compare case-insensitively
   const normalise = s => s.toLowerCase().replace(/\s+/g, '');
   const users = db.prepare('SELECT * FROM users').all();
   const user = users.find(u => normalise(u.name) === normalise(name));
@@ -112,7 +109,7 @@ app.post('/api/login', (req, res) => {
   res.json({ token, name: user.name, role: user.role });
 });
 
-// ── Users ──────────────────────────────────────────────────────
+// user management - admin only
 app.get('/api/users', requireAdmin, (req, res) => {
   res.json(db.prepare('SELECT id, name, email, role FROM users').all());
 });
@@ -136,7 +133,7 @@ app.delete('/api/users/:id', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
-// ── Printers ───────────────────────────────────────────────────
+// printer management
 app.get('/api/printers', requireAuth, (req, res) => {
   res.json(db.prepare('SELECT * FROM printers ORDER BY id').all());
 });
@@ -150,7 +147,7 @@ app.put('/api/printers/:id', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
-// ── Bookings ───────────────────────────────────────────────────
+// bookings
 app.get('/api/bookings', requireAuth, (req, res) => {
   res.json(db.prepare('SELECT * FROM bookings ORDER BY start').all());
 });
@@ -159,12 +156,11 @@ app.post('/api/bookings', requireAuth, (req, res) => {
   const { printer, start, end, title } = req.body;
   if (printer === undefined || !start || !end)
     return res.status(400).json({ error: 'Missing fields.' });
-  // check printer is online
   const printerRow = db.prepare('SELECT * FROM printers WHERE id = ?').get(printer);
   if (!printerRow || printerRow.status !== 'online')
     return res.status(409).json({ error: 'Printer is not available.' });
   const id = makeReservationId(printer, start);
-  // handle collisions by appending a counter
+  // if there is a collision, append a counter to keep the id unique
   let finalId = id;
   let attempt = 1;
   while (db.prepare('SELECT id FROM bookings WHERE id = ?').get(finalId)) {
@@ -194,11 +190,11 @@ app.delete('/api/bookings/:id', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
-// Catch-all → SPA
+// send everything else to the frontend
 app.get('*', (_req, res) =>
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 );
 
 app.listen(PORT, () =>
-  console.log(`✓ FabLab Scheduler → http://localhost:${PORT}`)
+  console.log(`FabLab Scheduler running at http://localhost:${PORT}`)
 );
