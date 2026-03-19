@@ -1,15 +1,38 @@
 # UVM FabLab 3D Printer Scheduler
 
-## To visit the active site:
-It can be found at: https://fablab.w3.uvm.edu
-To explore the site use a general vistor account (name `github`, PIN `0319`)
-
-
 A web app built for the [UVM SEED Program](https://www.uvm.edu/seed) to manage student access to self-serve 3D printers in the UVM FabLab. It handles training certification tracking, printer reservations, and user management, and is deployed on UVM's Silk shared hosting following [ETS documentation](https://silk.uvm.edu/manual/nodejs/#web-applications).
+
+## To visit the active site
+
+It can be found at: https://fablab.w3.uvm.edu
+
+To explore the site use a general visitor account (name `github`, PIN `0319`)
 
 ## About
 
 The UVM FabLab gives students access to digital fabrication tools including 3D printers. The SEED (Social Entrepreneurship, Engagement, and Design) Program supports student-led projects at UVM. This app was built to replace a manual sign-up process and make self-serve printer access easier to manage.
+
+## Screenshots
+
+**Login**
+![Login](screenshots/login.png)
+Students sign in with their name and a PIN. Login is case-insensitive and ignores spaces.
+
+**Scheduler — All Printers View**
+![All Printers](screenshots/all-printers.png)
+Weekly calendar showing all four printers with color-coded reservations. Printers can be toggled on/off to filter the view. Users can switch between week and day view.
+
+**My Bookings**
+![My Bookings](screenshots/my-bookings.png)
+Each user sees their own upcoming and past reservations with their unique FBL reservation ID.
+
+**Booking History (Admin only)**
+![History](screenshots/history.png)
+Admins can view all reservations across all printers, filter by printer or status, export the current week as a CSV, or clear history entirely.
+
+**Admin Panel**
+![Admin](screenshots/admin.png)
+Admins can add and remove users, assign roles, and manage printer availability. Taking a printer offline or setting it to maintenance prevents students from booking it until it is restored.
 
 ## Tech Stack
 
@@ -36,15 +59,15 @@ After completing in-person training, an admin activates their account in this sy
 
 | Role | What they can do |
 |------|-----------------|
-| `admin` | Manage users, printers, and all bookings |
-| `user` | Make, edit, and cancel their own reservations |
-| `read` | View the schedule only |
+| `admin` | Manage users, printers, and all bookings. Access booking history, CSV export, and printer status controls. |
+| `user` | Make, edit, and cancel their own reservations. View the full schedule. |
+| `read` | View the schedule only, cannot make bookings. |
 
 ## Adding Users
 
 Users are added by an admin through the web interface. You need a name, PIN, and role. Email is optional. Names are matched case-insensitively with spaces ignored, so "Anne Mara" and "annemara" will both work at login.
 
-A default admin account (name `Admin`, PIN `1234`) is created on first run. Change the PIN immediately. Util 
+A default admin account (name `Admin`, PIN `1234`) is created on first run. Change the PIN immediately.
 
 ## Printers
 
@@ -78,8 +101,8 @@ tail -f /var/opt/nginx-unit/fablab/unit.log
 ## Running Locally
 
 ```bash
-git clone https://github.com/aemara04/fablab.git
-cd fablab
+git clone https://github.com/aemara04/NT_Printers.git
+cd NT_Printers
 npm install
 node server.js
 ```
