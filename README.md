@@ -15,23 +15,23 @@ The UVM FabLab gives students access to digital fabrication tools including 3D p
 ## Screenshots
 
 **Login**
-![Login](screenshots/login.png)
+![Login](images/login.png)
 Students sign in with their name and a PIN. Login is case-insensitive and ignores spaces.
 
 **Scheduler — All Printers View**
-![All Printers](screenshots/all-printers.png)
+![All Printers](images/all-printers.png)
 Weekly calendar showing all four printers with color-coded reservations. Printers can be toggled on/off to filter the view. Users can switch between week and day view.
 
 **My Bookings**
-![My Bookings](screenshots/my-bookings.png)
+![My Bookings](images/my-bookings.png)
 Each user sees their own upcoming and past reservations with their unique FBL reservation ID.
 
 **Booking History (Admin only)**
-![History](screenshots/history.png)
+![History](images/history.png)
 Admins can view all reservations across all printers, filter by printer or status, export the current week as a CSV, or clear history entirely.
 
 **Admin Panel**
-![Admin](screenshots/admin.png)
+![Admin](images/admin.png)
 Admins can add and remove users, assign roles, and manage printer availability. Taking a printer offline or setting it to maintenance prevents students from booking it until it is restored.
 
 ## Tech Stack
