@@ -1,0 +1,11 @@
+next steps
+1. split the html to sections ( seperate files takes out the css from the style bocks)
+2 fix log in so its easier to know u can log in as a guest 
+3. only allow admin to see who is booked on the schedule
+  3Q: Unsure if they should still have titles even like random adjective + noun combo from a csv 
+4. add page to reader status to include the ratining steps
+5. Maybe even get the training link on the opening slide - like or could have a sign up function for future automation. 
+  5Q. As then users could use this as portal for all sections and we wouldnt have to have them sign up irl 
+6. look for better ways for users to inlude a pin - maybe even mkae them able to create it upon first log in 
+ 6N. whats the most robust way to do this
+7. what infomration actually needs to be exported? 
