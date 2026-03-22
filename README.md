@@ -10,7 +10,7 @@ To explore the site use a general visitor account (name `github`, PIN `0319`)
 
 ## About
 
-The UVM FabLab gives students access to digital fabrication tools including 3D printers. The SEED (Social Entrepreneurship, Engagement, and Design) Program supports student-led projects at UVM. This app was built to replace a manual sign-up process and make self-serve printer access easier to manage.
+The UVM FabLab gives students access to digital fabrication tools including 3D printers. The SEED (Senior Experience in Engineering Design). Program supports student-led projects at UVM. This app was built to replace a manual sign-up process and make self-serve printer access easier to manage.
 
 ## Screenshots
 
