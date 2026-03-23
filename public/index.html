@@ -2515,10 +2515,28 @@
             return;
         }
 
-        const btn = document.getElementById('cp-save');
-        btn.disabled = true;
-        btn.textContent = 'Saving…';
 
+
+const btn = document.getElementById('cp-save');
+btn.disabled = true;
+btn.textContent = 'Saving…';
+
+try {
+    await apiPut('/api/users/change-pin', {
+        current_pin: current,
+        new_pin: newPin
+    });
+    hideModal('change-pin-modal');
+    _changePinForced = false;
+    toast('✓ PIN updated successfully!');
+} catch (e) {
+    errEl.textContent = 'Incorrect current PIN, or server error. Please try again.';
+} finally {
+    btn.disabled = false;
+    btn.textContent = 'Update PIN';
+}
+    // ← END HERE - DELETE EVERYTHING AFTER THIS
+}
         // CORRECT:
         await apiPut('/api/users/change-pin', {
             current_pin: current,
