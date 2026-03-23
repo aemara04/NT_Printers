@@ -33,7 +33,8 @@ db.exec(`
     name       TEXT NOT NULL UNIQUE,
     email      TEXT,
     pin_hash   TEXT NOT NULL,
-    role       TEXT NOT NULL DEFAULT 'user'
+    role       TEXT NOT NULL DEFAULT 'user',
+    force_pin_change INTEGER DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS printers (
@@ -43,6 +44,13 @@ db.exec(`
     note    TEXT
   );
 `);
+
+// add the force_pin_change column if it doesn't exist (for existing databases)
+try {
+  db.exec('ALTER TABLE users ADD COLUMN force_pin_change INTEGER DEFAULT 0');
+} catch {
+  // column already exists, that's fine
+}
 
 // add printers on first run if the table is empty
 const printerCount = db.prepare('SELECT COUNT(*) as c FROM printers').get();
@@ -57,7 +65,7 @@ if (printerCount.c === 0) {
 const userCount = db.prepare('SELECT COUNT(*) as c FROM users').get();
 if (userCount.c === 0) {
   const hash = bcrypt.hashSync('1234', 10);
-  db.prepare('INSERT INTO users (name, pin_hash, role) VALUES (?, ?, ?)').run('Admin', hash, 'admin');
+  db.prepare('INSERT INTO users (name, pin_hash, role, force_pin_change) VALUES (?, ?, ?, ?)').run('Admin', hash, 'admin', 0);
   console.log('Default admin created: name="Admin" pin="1234" - change this immediately!');
 }
 
@@ -106,12 +114,12 @@ app.post('/api/login', (req, res) => {
   if (!bcrypt.compareSync(String(pin), user.pin_hash))
     return res.status(401).json({ error: 'Invalid name or PIN.' });
   const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '12h' });
-  res.json({ token, name: user.name, role: user.role });
+  res.json({ token, name: user.name, role: user.role, force_pin_change: user.force_pin_change });
 });
 
 // user management - admin only
 app.get('/api/users', requireAdmin, (req, res) => {
-  res.json(db.prepare('SELECT id, name, email, role FROM users').all());
+  res.json(db.prepare('SELECT id, name, email, role, force_pin_change FROM users').all());
 });
 
 app.post('/api/users', requireAdmin, (req, res) => {
@@ -120,7 +128,7 @@ app.post('/api/users', requireAdmin, (req, res) => {
   if (!['admin','user','read'].includes(role)) return res.status(400).json({ error: 'Invalid role.' });
   const pin_hash = bcrypt.hashSync(String(pin), 10);
   try {
-    db.prepare('INSERT INTO users (name, email, pin_hash, role) VALUES (?, ?, ?, ?)').run(name, email || null, pin_hash, role);
+    db.prepare('INSERT INTO users (name, email, pin_hash, role, force_pin_change) VALUES (?, ?, ?, ?, ?)').run(name, email || null, pin_hash, role, 0);
     res.json({ success: true });
   } catch {
     res.status(409).json({ error: 'User already exists.' });
@@ -131,6 +139,45 @@ app.delete('/api/users/:id', requireAdmin, (req, res) => {
   const r = db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
   if (r.changes === 0) return res.status(404).json({ error: 'Not found.' });
   res.json({ success: true });
+});
+
+// set force_pin_change flag for a user (admin only)
+app.put('/api/users/:id/force-pin-change', requireAdmin, (req, res) => {
+  const { force } = req.body;
+  if (force === undefined) return res.status(400).json({ error: 'force parameter required.' });
+  const r = db.prepare('UPDATE users SET force_pin_change = ? WHERE id = ?').run(force ? 1 : 0, req.params.id);
+  if (r.changes === 0) return res.status(404).json({ error: 'User not found.' });
+  res.json({ success: true });
+});
+
+// allow user to change their own PIN
+app.put('/api/users/change-pin', requireAuth, (req, res) => {
+  const { current_pin, new_pin } = req.body;
+  if (!current_pin || !new_pin) return res.status(400).json({ error: 'Current PIN and new PIN required.' });
+  
+  // validate new PIN is 4-8 digits
+  if (!/^\d{4,8}$/.test(new_pin)) 
+    return res.status(400).json({ error: 'New PIN must be 4-8 digits.' });
+  
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+  
+  // verify current PIN
+  if (!bcrypt.compareSync(String(current_pin), user.pin_hash))
+    return res.status(401).json({ error: 'Incorrect current PIN, or server error. Please try again.' });
+  
+  // update to new PIN
+  const new_hash = bcrypt.hashSync(String(new_pin), 10);
+  db.prepare('UPDATE users SET pin_hash = ?, force_pin_change = 0 WHERE id = ?').run(new_hash, req.user.id);
+  
+  res.json({ success: true });
+});
+
+// check if user needs to change PIN (for frontend to show warning)
+app.get('/api/users/check-pin-status', requireAuth, (req, res) => {
+  const user = db.prepare('SELECT force_pin_change FROM users WHERE id = ?').get(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found.' });
+  res.json({ force_pin_change: user.force_pin_change });
 });
 
 // printer management
