@@ -1100,8 +1100,7 @@ function makeCalendar(idx) {
             if (ev === skipEv || ev.extendedProps.type !== 'reservation') return false;
             if (currentUser.role === 'admin') return false;
             const eS = ev.start, eE = ev.end || new Date(ev.start.getTime() + 30*60000);
-            if (ev.extendedProps.owner !== currentUser.name) return start < eE && end > eS;
-            return false;
+            return start < eE && end > eS;
         });
     }
     const cal = new FullCalendar.Calendar(el, {
@@ -1138,6 +1137,32 @@ function makeCalendar(idx) {
             try {
                 await apiPut('/api/bookings/' + ev.extendedProps.id, { start:ev.start.toISOString(), end:(ev.end || new Date(ev.start.getTime()+30*60000)).toISOString() });
                 toast('Reservation updated.'); updateAllStats(); refreshOverview();
+            } catch(e) { info.revert(); toast('⚠ Could not save resize.'); }
+        },
+        eventResize: async function(info) {
+            const ev = info.event;
+            // Fix 3: non-admins cannot resize other people's bookings
+            if (currentUser.role === 'read') { info.revert(); return; }
+            if (currentUser.role !== 'admin' && ev.extendedProps.owner !== currentUser.name) {
+                toast('You can only resize your own reservations.');
+                info.revert(); return;
+            }
+            const end = ev.end || new Date(ev.start.getTime() + 30*60000);
+            // Fix 2: check for conflicts after resize
+            if (hasConflict(ev, ev.start, end)) {
+                const ok = await choiceModal({
+                    title: 'Conflict',
+                    message: 'This resize overlaps another booking. Resize anyway?',
+                    confirmText: 'Resize Anyway', cancelText: 'Undo'
+                });
+                if (!ok) { info.revert(); return; }
+            }
+            try {
+                await apiPut('/api/bookings/' + ev.extendedProps.id, {
+                    start: ev.start.toISOString(),
+                    end: end.toISOString()
+                });
+                toast('Reservation resized.'); updateAllStats(); refreshOverview();
             } catch(e) { info.revert(); toast('⚠ Could not save resize.'); }
         },
         eventClick: async function(info) {
