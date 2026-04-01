@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
@@ -306,7 +306,7 @@
     </div>
     <h2>Sign In</h2>
     <p class="sub">Enter your netID and PIN to continue.</p>
-    <div class="field"><label>Name</label><input type="text" id="login-name" placeholder="Your full name" autocomplete="off"/></div>
+    <div class="field"><label>netID</label><input type="text" id="login-name" placeholder="Your full name" autocomplete="off"/></div>
     <div class="field"><label>PIN</label><input type="password" id="login-pin" placeholder="••••" maxlength="8"/></div>
     <div id="login-error"></div>
     <button class="btn-primary" id="login-btn">Sign In</button>
@@ -813,7 +813,7 @@ async function doLogin() {
     try {
         const res  = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, pin}) });
         const data = await res.json();
-        if (!res.ok) { errEl.textContent = data.error || 'Invalid name or PIN.'; btn.disabled = false; btn.textContent = 'Sign In'; return; }
+        if (!res.ok) { errEl.textContent = data.error || 'Invalid netID or PIN.'; btn.disabled = false; btn.textContent = 'Sign In'; return; }
         authToken   = data.token;
         // ── FIX 3: was data.must_change_pin — backend sends data.force_pin_change ──
         currentUser = { name: data.name, role: data.role, mustChangePIN: !!data.force_pin_change };
