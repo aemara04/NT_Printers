@@ -1,32 +1,56 @@
 
     :root {
-        --uvm-green: #154734;
-        --uvm-green-dark: #0d2e22;
-        --uvm-green-mid: #1d5c42;
-        --uvm-gold: #F5B800;
+        /* UVM colors can be found at https://www.uvm.edu/stratcomm/brand/color-palette */
+        
+        --uvm-green: #154734; /* used for buttons, headers, accents*/
+        --uvm-green-dark: #0d2e22; /* used for topbar background, table headers */
+        --uvm-green-mid: #1d5c42; /* used for hover states*/
+        --uvm-gold: #F5B800;    /* used for highlights, status indicators */
         --white: #ffffff;
-        --off-white: #f4f5f0;
-        --border: #d6d9d0;
-        --text: #1a1a1a;
+        --off-white: #f4f5f0; /* used for backgrounds */
+        --border: #d6d9d0; /* used for borders */
+        --text: #1a1a1a; 
         --muted: #5a6357;
-        --red: #b91c1c;
+        --red: #b91c1c; 
         --avail-green: #15803d;
         --avail-bg: #dcfce7;
         --busy-red: #dc2626;
         --busy-bg: #fee2e2;
+
+        /* These 4 colors, are the colors assigned to the each type of booking*/
+        /* In this case these are the 4 printers*/
         --leo: #1a4a9c;
         --don: #7b3fa0;
         --raph: #c0392b;
         --mikey: #e07b00;
     }
-
+/* RESET*/
+/* makes sure that the same appearence is seen across browsers */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body { font-family: 'Roboto', sans-serif; background: var(--off-white); color: var(--text); min-height: 100vh; }
+/* LOGIN STYLES */
+/* This styles the login screen, before user input */
 
-    #login-overlay { position: fixed; inset: 0; z-index: 1000; background: var(--uvm-green-dark); display: flex; align-items: center; justify-content: center; transition: opacity .35s ease; }
+    #login-overlay { position: fixed; 
+        inset: 0; z-index: 1000; 
+        background: var(--uvm-green-dark); 
+        display: flex; align-items: center; 
+        justify-content: center;
+        transition: opacity .35s ease; }
     #login-overlay.hidden { opacity: 0; pointer-events: none; }
-    .login-card { background: var(--white); width: 440px; max-width: 95vw; border-top: 6px solid var(--uvm-gold); border-radius: 2px; padding: 48px 44px 44px; box-shadow: 0 20px 60px rgba(0,0,0,.35); animation: rise .4s cubic-bezier(.22,1,.36,1); }
+
+/* Login card is the white box on the log in page*/
+
+    .login-card { background: var(--white); 
+        width: 440px; max-width: 95vw; 
+        border-top: 6px solid var(--uvm-gold);
+         border-radius: 2px; padding: 48px 44px 44px; 
+         box-shadow: 0 20px 60px rgba(0,0,0,.35); 
+         animation: rise .4s cubic-bezier(.22,1,.36,1); }
+
+        
+/* Keyframes animates the log in, creating the rise effect*/
     @keyframes rise { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:none } }
     .login-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 30px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
     .uvm-logo-box { width: 44px; height: 44px; background: var(--uvm-green); border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
